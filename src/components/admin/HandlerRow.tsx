@@ -5,6 +5,7 @@ import { deleteHandler, updateHandler } from "@/lib/actions";
 import type { TreeHandler } from "@/lib/queries";
 import { useBoard } from "./BoardContext";
 import { EditableText } from "./EditableText";
+import { RoleSelect } from "./RoleSelect";
 import { btnDanger } from "./ui";
 
 export function HandlerRow({ handler, handle }: { handler: TreeHandler; handle: ReactNode }) {
@@ -12,13 +13,7 @@ export function HandlerRow({ handler, handle }: { handler: TreeHandler; handle: 
   return (
     <div className="flex items-center gap-2">
       {handle}
-      <EditableText
-        value={handler.role}
-        list="role-options"
-        placeholder="Role"
-        className="!w-44"
-        onSave={(role) => run(updateHandler(handler.id, { role }))}
-      />
+      <RoleSelect value={handler.role} onSave={(role) => run(updateHandler(handler.id, { role }))} />
       <span className="text-[#6d6f78]">:</span>
       <EditableText
         value={handler.name}

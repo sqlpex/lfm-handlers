@@ -10,7 +10,7 @@ import { EditorsPanel } from "./EditorsPanel";
 import { PostPanel } from "./PostPanel";
 import { SettingsPanel } from "./SettingsPanel";
 import { SortableList } from "./SortableList";
-import { btnPrimary, panel, panelTitle, ROLE_SUGGESTIONS } from "./ui";
+import { btnPrimary, panel, panelTitle } from "./ui";
 
 type Props = {
   tree: Tree;
@@ -24,11 +24,6 @@ type Props = {
 export function AdminBoard(props: Props) {
   return (
     <BoardProvider>
-      <datalist id="role-options">
-        {ROLE_SUGGESTIONS.map((r) => (
-          <option key={r} value={r} />
-        ))}
-      </datalist>
       <Board {...props} />
     </BoardProvider>
   );
