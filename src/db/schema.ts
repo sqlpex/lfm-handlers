@@ -50,6 +50,9 @@ export const structureDocs = pgTable("structure_docs", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   sortOrder: integer("sort_order").notNull().default(0),
+  // Each document posts to its own Discord channel, unlike Handlers which has
+  // one fixed channel, so the webhook lives on the row instead of an env var.
+  webhookUrl: text("webhook_url"),
   discordMessageIds: text("discord_message_ids").notNull().default("[]"),
 });
 

@@ -16,10 +16,6 @@ export function handlersWebhookConfigured(): boolean {
   return Boolean(process.env.DISCORD_WEBHOOK_URL);
 }
 
-export function structureWebhookConfigured(): boolean {
-  return Boolean(process.env.LFM_STRUCTURE_WEBHOOK_URL);
-}
-
 function toBase(raw: string): string {
   const u = new URL(raw);
   return `${u.origin}${u.pathname}`;
@@ -115,14 +111,18 @@ export async function postTreeToDiscord(
   return postEmbeds(raw, embeds, tree.map((c) => c.name), settings, previousIds);
 }
 
-/** Posts one structure document's roles as embeds to the Structure channel. */
+/**
+ * Posts one structure document's roles as embeds to that document's own channel.
+ * Unlike Handlers, each structure document carries its own webhook URL (set by
+ * an editor on the document itself) since editors can create new documents that
+ * post to different channels without a redeploy.
+ */
 export async function postRolesToDiscord(
+  webhookUrl: string,
   roles: RoleLike[],
   settings: EmbedSettings,
   previousIds: string[],
 ): Promise<PostResult> {
-  const raw = process.env.LFM_STRUCTURE_WEBHOOK_URL;
-  if (!raw) throw new Error("LFM_STRUCTURE_WEBHOOK_URL is not set.");
   const embeds = buildRoleEmbeds(roles, settings);
-  return postEmbeds(raw, embeds, roles.map((r) => r.name), settings, previousIds);
+  return postEmbeds(webhookUrl, embeds, roles.map((r) => r.name), settings, previousIds);
 }

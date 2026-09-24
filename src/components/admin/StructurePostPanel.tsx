@@ -1,16 +1,18 @@
 "use client";
 
 import { EmbedCard } from "@/components/EmbedCard";
-import { forgetStructureDiscordMessage, postStructureDocToDiscord } from "@/lib/actions";
+import { forgetStructureDiscordMessage, postStructureDocToDiscord, updateStructureDocWebhook } from "@/lib/actions";
 import { buildRoleEmbeds } from "@/lib/embed";
 import type { StructureTreeDoc } from "@/lib/queries";
 import { useBoard } from "./BoardContext";
+import { EditableText } from "./EditableText";
 import { btnGhost, btnPrimary, panel, panelTitle } from "./ui";
 
-type Props = { doc: StructureTreeDoc; settings: Record<string, string>; webhookConfigured: boolean };
+type Props = { doc: StructureTreeDoc; settings: Record<string, string> };
 
-export function StructurePostPanel({ doc, settings, webhookConfigured }: Props) {
+export function StructurePostPanel({ doc, settings }: Props) {
   const { run, pending } = useBoard();
+  const webhookConfigured = Boolean(doc.webhookUrl);
 
   let messageCount = 0;
   try {
@@ -28,7 +30,7 @@ export function StructurePostPanel({ doc, settings, webhookConfigured }: Props) 
           <h2 className={panelTitle}>{doc.title}</h2>
           <p className="mt-1 text-sm text-[#b5bac1]">
             {!webhookConfigured
-              ? "Set LFM_STRUCTURE_WEBHOOK_URL in the environment to enable posting."
+              ? "Set a webhook below to enable posting."
               : messageCount > 0
                 ? `Will edit the existing message${messageCount > 1 ? "s" : ""} in place.`
                 : "Will post a new message to the channel."}
@@ -43,6 +45,18 @@ export function StructurePostPanel({ doc, settings, webhookConfigured }: Props) 
           Post to Discord
         </button>
       </div>
+
+      <label className="mt-3 block space-y-1">
+        <span className="text-xs text-[#b5bac1]">
+          This document&apos;s Discord webhook URL
+        </span>
+        <EditableText
+          value={doc.webhookUrl ?? ""}
+          placeholder="https://discord.com/api/webhooks/..."
+          onSave={(webhookUrl) => run(updateStructureDocWebhook(doc.id, webhookUrl))}
+        />
+      </label>
+
       {messageCount > 0 && (
         <button
           type="button"

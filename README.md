@@ -23,7 +23,7 @@ Stack: Next.js 16 (App Router), Neon Postgres via Drizzle, Auth.js with the Disc
 
 1. In Discord, open the target channel's settings, then **Integrations**, then **Webhooks**, then **New Webhook**.
 2. Copy the webhook URL. The name and avatar you set here are overridden by the app's embed settings, so leave them default.
-3. Repeat for the Structure channel (it can be the same channel or a different one) if you want that section to be able to post too.
+3. Handlers has one fixed channel, set as an environment variable (below). Each LFM Structure document has its own channel instead: create one webhook per document and paste each URL into that document's panel on `/admin/structure`, no redeploy needed.
 
 **Editor IDs**
 
@@ -42,9 +42,8 @@ Enable Developer Mode in Discord (User Settings, Advanced), right-click a user, 
 | `AUTH_DISCORD_SECRET` | Discord application client secret |
 | `ADMIN_DISCORD_IDS` | comma-separated Discord user IDs of the bootstrap admins |
 | `DISCORD_WEBHOOK_URL` | Handlers channel webhook URL |
-| `LFM_STRUCTURE_WEBHOOK_URL` | Structure channel webhook URL (optional; that section's Post button stays disabled without it) |
 
-4. Deploy.
+4. Deploy. Then set each LFM Structure document's webhook from its own panel on `/admin/structure` (see above) — there's no environment variable for it.
 
 ## 3. Create the tables and seed
 
@@ -83,9 +82,9 @@ Open <http://localhost:3000>. Handlers admin is at `/admin`, Structure admin at 
 
 | Path | What it does |
 | --- | --- |
-| `src/db/schema.ts` | tables: `categories`, `factions`, `handlers` (Handlers) and `structureDocs`, `structureRoles` (Structure), plus `editors`, `settings` |
+| `src/db/schema.ts` | tables: `categories`, `factions`, `handlers` (Handlers) and `structureDocs`, `structureRoles` (Structure), plus `editors`, `settings`. Each `structureDocs` row carries its own `webhookUrl` |
 | `src/lib/embed.ts` | turns either a category tree or a structure document's roles into Discord embed objects; used by both the preview and the webhook |
-| `src/lib/discord.ts` | webhook client for both channels; edits previous messages in place, creates new ones when needed |
+| `src/lib/discord.ts` | webhook client, given whichever URL applies (env var for Handlers, `doc.webhookUrl` for Structure); edits previous messages in place, creates new ones when needed |
 | `src/lib/actions.ts` | server actions behind every edit; each one checks the editor allowlist |
 | `src/lib/access.ts` | who counts as an editor (env admins plus the `editors` table) |
 | `src/components/EmbedCard.tsx` | Discord-look rendering of a built embed, including real bullet lists, used everywhere an embed is previewed |

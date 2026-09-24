@@ -8,7 +8,7 @@ import { StructureDocEditor } from "./StructureDocEditor";
 import { StructurePostPanel } from "./StructurePostPanel";
 import { btnPrimary } from "./ui";
 
-type Props = { docs: StructureTree; settings: Record<string, string>; webhookConfigured: boolean };
+type Props = { docs: StructureTree; settings: Record<string, string> };
 
 export function StructureBoard(props: Props) {
   return (
@@ -18,7 +18,7 @@ export function StructureBoard(props: Props) {
   );
 }
 
-function Board({ docs, settings, webhookConfigured }: Props) {
+function Board({ docs, settings }: Props) {
   const { run, pending } = useBoard();
 
   return (
@@ -44,7 +44,7 @@ function Board({ docs, settings, webhookConfigured }: Props) {
 
       <aside className="space-y-4 self-start lg:sticky lg:top-6 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto lg:pr-1">
         {docs.map((doc) => (
-          <StructurePostPanel key={doc.id} doc={doc} settings={settings} webhookConfigured={webhookConfigured} />
+          <StructurePostPanel key={doc.id} doc={doc} settings={settings} />
         ))}
       </aside>
     </div>

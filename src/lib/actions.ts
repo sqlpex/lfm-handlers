@@ -181,6 +181,25 @@ export async function updateStructureDocTitle(id: number, title: string): Promis
   });
 }
 
+export async function updateStructureDocWebhook(id: number, webhookUrl: string): Promise<ActionResult> {
+  return run(async () => {
+    await requireEditor();
+    const value = webhookUrl.trim();
+    if (value) {
+      try {
+        new URL(value);
+      } catch {
+        throw new Error("That doesn't look like a valid URL.");
+      }
+    }
+    await getDb()
+      .update(structureDocs)
+      .set({ webhookUrl: value || null })
+      .where(eq(structureDocs.id, id));
+    return "Webhook saved.";
+  });
+}
+
 export async function deleteStructureDoc(id: number): Promise<ActionResult> {
   return run(async () => {
     await requireEditor();
@@ -330,6 +349,7 @@ export async function postStructureDocToDiscord(docId: number): Promise<ActionRe
       getSettings(),
     ]);
     if (!doc) throw new Error("That document no longer exists.");
+    if (!doc.webhookUrl) throw new Error("Set a Discord webhook for this document first.");
     if (doc.roles.length === 0) throw new Error("There are no roles to post in this document.");
 
     let previous: string[] = [];
@@ -339,7 +359,7 @@ export async function postStructureDocToDiscord(docId: number): Promise<ActionRe
       previous = [];
     }
 
-    const result = await postRolesToDiscord(doc.roles, currentSettings, previous);
+    const result = await postRolesToDiscord(doc.webhookUrl, doc.roles, currentSettings, previous);
     await getDb()
       .update(structureDocs)
       .set({ discordMessageIds: JSON.stringify(result.messageIds) })
