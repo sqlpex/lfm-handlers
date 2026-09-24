@@ -19,6 +19,9 @@ export function SiteHeader({ user, canEdit, title = "Legal Faction Management" }
           <Link href="/" className="text-[#b5bac1] hover:text-white">
             Handlers
           </Link>
+          <Link href="/structure" className="text-[#b5bac1] hover:text-white">
+            Structure
+          </Link>
           {canEdit && (
             <Link href="/admin" className="text-[#b5bac1] hover:text-white">
               Admin

@@ -1,6 +1,7 @@
-import { DiscordEmbed } from "@/components/DiscordEmbed";
+import { EmbedCard } from "@/components/EmbedCard";
 import { SiteHeader } from "@/components/SiteHeader";
 import { currentUser, isEditor } from "@/lib/access";
+import { buildEmbeds } from "@/lib/embed";
 import { getSettings, getTree } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
@@ -35,13 +36,8 @@ export default async function HomePage() {
           <p className="text-[#949ba4]">No categories yet. Sign in as an editor to add some.</p>
         ) : (
           <div className="flex flex-col gap-4">
-            {tree.map((category, i) => (
-              <DiscordEmbed
-                key={category.id}
-                category={category}
-                settings={settings}
-                isLast={i === tree.length - 1}
-              />
+            {buildEmbeds(tree, settings).map((embed, i) => (
+              <EmbedCard key={tree[i].id} embed={embed} color={tree[i].color} />
             ))}
           </div>
         )}

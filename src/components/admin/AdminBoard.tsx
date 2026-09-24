@@ -1,8 +1,9 @@
 "use client";
 
-import { DiscordEmbed } from "@/components/DiscordEmbed";
+import { EmbedCard } from "@/components/EmbedCard";
 import type { Editor } from "@/db/schema";
 import { createCategory, reorderCategories } from "@/lib/actions";
+import { buildEmbeds } from "@/lib/embed";
 import type { Tree } from "@/lib/queries";
 import { BoardProvider, useBoard } from "./BoardContext";
 import { CategoryEditor } from "./CategoryEditor";
@@ -67,8 +68,8 @@ function Board({ tree, editors, envAdmins, settings, meId, webhookConfigured }: 
           <h2 className={panelTitle}>Preview</h2>
           <p className="mt-1 text-xs text-[#949ba4]">This is what the webhook will post.</p>
           <div className="mt-3 space-y-3">
-            {tree.map((category, i) => (
-              <DiscordEmbed key={category.id} category={category} settings={settings} isLast={i === tree.length - 1} />
+            {buildEmbeds(tree, settings).map((embed, i) => (
+              <EmbedCard key={tree[i].id} embed={embed} color={tree[i].color} />
             ))}
           </div>
         </section>

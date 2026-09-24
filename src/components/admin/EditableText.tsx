@@ -9,12 +9,22 @@ type Props = {
   placeholder?: string;
   className?: string;
   multiline?: boolean;
+  maxRows?: number;
   list?: string;
   ariaLabel?: string;
 };
 
 /** Text field that saves on blur (or Enter for single-line) and resets on Escape. */
-export function EditableText({ value, onSave, placeholder, className, multiline, list, ariaLabel }: Props) {
+export function EditableText({
+  value,
+  onSave,
+  placeholder,
+  className,
+  multiline,
+  maxRows = 8,
+  list,
+  ariaLabel,
+}: Props) {
   const [draft, setDraft] = useState(value);
   const [synced, setSynced] = useState(value);
   if (synced !== value) {
@@ -38,7 +48,7 @@ export function EditableText({ value, onSave, placeholder, className, multiline,
     return (
       <textarea
         {...shared}
-        rows={Math.min(8, Math.max(2, draft.split("\n").length + 1))}
+        rows={Math.min(maxRows, Math.max(2, draft.split("\n").length + 1))}
         onChange={(e) => setDraft(e.target.value)}
         onKeyDown={(e) => {
           if (e.key === "Escape") setDraft(value);

@@ -1,6 +1,6 @@
 import { asc } from "drizzle-orm";
 import { getDb } from "@/db";
-import { categories, editors, factions, handlers, settings } from "@/db/schema";
+import { categories, editors, factions, handlers, settings, structureDocs, structureRoles } from "@/db/schema";
 
 export async function getTree() {
   return getDb().query.categories.findMany({
@@ -29,3 +29,16 @@ export async function getSettings(): Promise<Record<string, string>> {
 export async function getEditors() {
   return getDb().select().from(editors).orderBy(asc(editors.createdAt));
 }
+
+export async function getStructureDocs() {
+  return getDb().query.structureDocs.findMany({
+    orderBy: [asc(structureDocs.sortOrder), asc(structureDocs.id)],
+    with: {
+      roles: { orderBy: [asc(structureRoles.sortOrder), asc(structureRoles.id)] },
+    },
+  });
+}
+
+export type StructureTree = Awaited<ReturnType<typeof getStructureDocs>>;
+export type StructureTreeDoc = StructureTree[number];
+export type StructureTreeRole = StructureTreeDoc["roles"][number];

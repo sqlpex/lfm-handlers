@@ -50,3 +50,59 @@ function render(text: string, keyPrefix = ""): ReactNode[] {
 export function Markdown({ text, className }: { text: string; className?: string }) {
   return <span className={className}>{render(text)}</span>;
 }
+
+const BULLET = /^[-*]\s+(.*)$/;
+
+/**
+ * Renders an embed description the way Discord does: consecutive "- " / "* "
+ * lines become a real bullet list, everything else stays grouped into
+ * paragraphs (a blank line starts a new one), with inline markdown applied
+ * throughout.
+ */
+export function EmbedDescription({ text }: { text: string }) {
+  const lines = text.split("\n");
+  const blocks: ReactNode[] = [];
+  let paragraph: string[] = [];
+  let list: string[] = [];
+
+  const flushParagraph = () => {
+    if (paragraph.length === 0) return;
+    blocks.push(
+      <p key={`p${blocks.length}`} className="whitespace-pre-wrap text-sm leading-[1.375rem]">
+        <Markdown text={paragraph.join("\n")} />
+      </p>,
+    );
+    paragraph = [];
+  };
+  const flushList = () => {
+    if (list.length === 0) return;
+    blocks.push(
+      <ul key={`l${blocks.length}`} className="ml-4 list-disc space-y-0.5 text-sm leading-[1.375rem] marker:text-[#949ba4]">
+        {list.map((item, i) => (
+          <li key={i}>
+            <Markdown text={item} />
+          </li>
+        ))}
+      </ul>,
+    );
+    list = [];
+  };
+
+  for (const line of lines) {
+    const bullet = BULLET.exec(line);
+    if (bullet) {
+      flushParagraph();
+      list.push(bullet[1]);
+    } else if (line.trim() === "") {
+      flushList();
+      flushParagraph();
+    } else {
+      flushList();
+      paragraph.push(line);
+    }
+  }
+  flushList();
+  flushParagraph();
+
+  return <div className="space-y-2">{blocks}</div>;
+}
